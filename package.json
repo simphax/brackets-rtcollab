@@ -1,0 +1,12 @@
+{
+    "name": "brackets-rtc-collab",
+    "version": "0.0.1",
+    "description": "Collaborate in real time using your Google Drive account",
+    "keywords": ".js, .json, realtime, collaboration, cloud, pair-programming",
+    "categories": ["general", "editing"],
+    "engines": ">=23",
+    "contributors": [
+        {"name": "Simon Nilsson", "email": "sim.nilsson@gmail.com", "url": "https://github.com/simphax"},
+    ],
+    "license": "MIT"
+}
