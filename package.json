@@ -1,5 +1,5 @@
 {
-    "name": "brackets-rtc-collab",
+    "name": "brackets-rtcollab",
     "version": "0.0.1",
     "description": "Collaborate in real time using your Google Drive account",
     "keywords": ".js, .json, realtime, collaboration, cloud, pair-programming",

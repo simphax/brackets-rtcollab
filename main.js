@@ -40,33 +40,84 @@ define(function (require, exports, module) {
         AppInit                 = brackets.getModule("utils/AppInit"),
         Dialogs                 = brackets.getModule("widgets/Dialogs"),
         _projectCollabEnabled   = false,
-        RTCC_ENABLE_EXT         = "simphax.rtcc.enable";
+        _currentView            = "realtime",
+        RTCC_VIEW_REALTIME_EXT  = "simphax.rtcc.view_realtime",
+        RTCC_VIEW_LOCAL_EXT     = "simphax.rtcc.view_local";
 
     function _init() {
+        if(_currentView == "realtime") {
+            _setRealtimeView();
+        } else {
+            _setLocalView();
+        }
     }
 
     function _initHTML() {
         /*var e = $("<h1>hej</h1>");
         $(".project-settings-dialog .modal-body").append("<h1>hej</h1>");
         */
+        if(_currentView == "realtime") {
+            var editor = EditorManager.getCurrentFullEditor();
+            console.debug(editor);
+        } else {
+            
+        }
     }
 
-    function _enableRtccOnProject() {
-        _projectCollabEnabled = !_projectCollabEnabled;
-        CommandManager.get(RTCC_ENABLE_EXT).setChecked(_projectCollabEnabled);
+    function _setRealtimeView() {
+        _currentView = "realtime";
+        CommandManager.get(RTCC_VIEW_REALTIME_EXT).setChecked(true);
+        CommandManager.get(RTCC_VIEW_LOCAL_EXT).setChecked(false);
         //Dialogs.showModalDialog("rtccmodal","Dialog",ProjectManager.getProjectRoot());
-        window.alert(ProjectManager.getProjectRoot());
+        //window.alert(ProjectManager.getProjectRoot());
     }
+
+    function _setLocalView() {
+        _currentView = "local";
+        CommandManager.get(RTCC_VIEW_REALTIME_EXT).setChecked(false);
+        CommandManager.get(RTCC_VIEW_LOCAL_EXT).setChecked(true);
+    }
+
+    function _handleDocumentChange(event, document, changeList) {
+        //var editor = document._masterEditor;
+        console.debug("Document change");
+        console.debug(changeList);
+        //console.debug(editor);
+    }
+    
+    function _registerHandlers(editor, fileType) {
+        console.debug("register handlers");
+        var cm = editor._codeMirror, doc = editor.document;
+        if (cm) {
+            $(doc).on("change", _handleDocumentChange);
+        }
+    }
+    
+    function _deregisterHandlers(editor) {
+        $(editor.document).off("change", _handleDocumentChange);
+    }
+
+    $(EditorManager).on("activeEditorChange", function (event, current, previous) {
+        if (previous) {
+            _deregisterHandlers(previous);
+        }
+        if (current) {
+            _registerHandlers(current);
+        }
+    });
 
     AppInit.appReady(_init);
     AppInit.htmlReady(_initHTML);
 
-
     //Load stylesheet
     ExtensionUtils.loadStyleSheet(module, "main.less");
 
-    CommandManager.register("Enable Realtime Collab",RTCC_ENABLE_EXT,_enableRtccOnProject)
     Menus.getMenu(Menus.AppMenuBar.FILE_MENU).addMenuDivider();
-    Menus.getMenu(Menus.AppMenuBar.FILE_MENU).addMenuItem(RTCC_ENABLE_EXT);
+
+    CommandManager.register("Show Collab View",RTCC_VIEW_REALTIME_EXT,_setRealtimeView);
+    Menus.getMenu(Menus.AppMenuBar.FILE_MENU).addMenuItem(RTCC_VIEW_REALTIME_EXT);
+
+    CommandManager.register("Show Local View",RTCC_VIEW_LOCAL_EXT,_setLocalView);
+    Menus.getMenu(Menus.AppMenuBar.FILE_MENU).addMenuItem(RTCC_VIEW_LOCAL_EXT);
     
 });
